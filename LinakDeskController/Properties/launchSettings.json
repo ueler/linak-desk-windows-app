@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LinakDeskController (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "LinakDeskController (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
