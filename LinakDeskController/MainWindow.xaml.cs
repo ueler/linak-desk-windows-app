@@ -13,6 +13,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,6 +32,7 @@ namespace LinakDeskController
         public MainWindow()
         {
             this.InitializeComponent();
+
             this.linakDeskCommandCoordinator.getHeightSubject().Subscribe(height =>
             {
                 dispatcherQueue.TryEnqueue(() =>
@@ -38,11 +40,17 @@ namespace LinakDeskController
                     info.Text = "Table height: " + height;
                 });
             });
+            this.linakDeskCommandCoordinator.run();
         }
 
-        private void myButton_Click(object sender, RoutedEventArgs e)
+        private void moveUp_Click(object sender, RoutedEventArgs e)
         {
-            this.linakDeskCommandCoordinator.setDeskTargetHeight(2000);
+            this.linakDeskCommandCoordinator.setDeskTargetHeight(6100);
+        }
+
+        private void moveDown_Click(object sender, RoutedEventArgs e)
+        {
+            this.linakDeskCommandCoordinator.setDeskTargetHeight(1700);
         }
     }
 }
