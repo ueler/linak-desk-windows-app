@@ -1,62 +1,90 @@
-﻿using System;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
+﻿using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+using LinakDeskController.LinakDesk;
 
 namespace LinakDeskController
 {
-    internal class LinakDeskCommandCoordinator
+    public class LinakDeskCommandCoordinator
     {
-        private bool running = true;
+        private const short Tolerance = 50;
+        private readonly bool _running = true;
+        private bool _targetReached = true;
 
-        private Subject<short> heightSubject = new Subject<short>();
+        private readonly Subject<short> _heightSubject = new();
 
-        private short targetHeight = -1;
-        private short height = -1;
-        private readonly short tolerance = 50;
+        private short _targetHeight = -1;
+        private short _height = -1;
 
-        public LinakDeskCommandCoordinator()
+        public void Run()
         {
-        }
-
-        public void run()
-        {
-            Thread thread = new Thread(readAndSet);
+            Thread thread = new Thread(ReadAndSet);
             thread.Start();
         }
 
-        private async void readAndSet()
+        private async void ReadAndSet()
         {
-            this.height = await LinakDeskHID.getDeskHeight();
-            this.targetHeight = this.height;
+            _height = await LinakDeskHid.GetDeskHeight();
+            _targetHeight = _height;
 
-            while (running)
+            while (_running)
             {
-                this.height = await LinakDeskHID.getDeskHeight();
-                this.heightSubject.OnNext(this.height);
-
-                if (this.height > this.targetHeight + tolerance || this.height < this.targetHeight - tolerance)
+                if (_targetReached)
                 {
-                    await LinakDeskHID.setDeskHeight(this.targetHeight);
+                    await Task.Delay(2000);
+                    continue;
+                }
+
+                _height = await LinakDeskHid.GetDeskHeight();
+                _heightSubject.OnNext(_height);
+
+                if (_height > _targetHeight + Tolerance || _height < _targetHeight - Tolerance)
+                {
+                    await LinakDeskHid.SetDeskHeight(_targetHeight);
                     await Task.Delay(200);
                 }
                 else
                 {
-                    await Task.Delay(2000);
+                    _targetReached = true;
                 }
             }
         }
 
-        public void setDeskTargetHeight(short height)
+        public void MoveToStandingHeight(LinakDeskControllerSettings settings)
         {
-            this.targetHeight = height;
+            SetDeskTargetHeight((short)(settings.StandingHeight * 100));
+            _targetReached = false;
         }
 
-        public Subject<short> getHeightSubject()
+        public void MoveToSittingHeight(LinakDeskControllerSettings settings)
         {
-            return this.heightSubject;
+            SetDeskTargetHeight((short)(settings.SittingHeight * 100));
+            _targetReached = false;
         }
-     }
+
+        private void SetDeskTargetHeight(short height)
+        {
+            _targetHeight = height;
+        }
+
+        public DeskStatus GetDeskStatus(LinakDeskControllerSettings settings)
+        {
+            if (_height < (settings.SittingHeight * 100) + Tolerance)
+            {
+                return DeskStatus.OnSittingHeight;
+            }
+
+            if (_height > (settings.StandingHeight * 100) - Tolerance)
+            {
+                return DeskStatus.OnStandingHeight;
+            }
+
+            return DeskStatus.OnOtherHeight;
+        }
+
+        public Subject<short> GetHeightSubject()
+        {
+            return _heightSubject;
+        }
+    }
 }

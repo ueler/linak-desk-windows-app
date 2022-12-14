@@ -5,6 +5,8 @@
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
   IgnorableNamespaces="uap rescap iot">
 
   <Identity
@@ -35,11 +37,25 @@
         DisplayName="LinakDeskController"
         Description="LinakDeskController"
         BackgroundColor="transparent"
-        Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        Square44x44Logo="Assets\Square44x44Logo.png" Square150x150Logo="Assets\desk150.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\desk150.png" >
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo"/>
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile >
       </uap:VisualElements>
+		<Extensions>
+			<desktop:Extension Category="windows.toastNotificationActivation">
+				<desktop:ToastNotificationActivation ToastActivatorCLSID="da524255-c55a-4718-8a21-ee375f9dbfac" />
+			</desktop:Extension>
+			<com:Extension Category="windows.comServer">
+				<com:ComServer>
+					<com:ExeServer Executable="LinakDeskController.exe" Arguments="-ToastActivated" DisplayName="Toast activator">
+						<com:Class Id="da524255-c55a-4718-8a21-ee375f9dbfac" DisplayName="Toast activator"/>
+					</com:ExeServer>
+				</com:ComServer>
+			</com:Extension>
+		</Extensions>
     </Application>
   </Applications>
 

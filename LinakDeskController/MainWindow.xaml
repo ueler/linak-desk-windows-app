@@ -21,49 +21,48 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="10">
             <muxc:NumberBox x:Name="standingHeightNumberBox"
-                Header="Standing height:"
-                Width="120"
-                Maximum="100"
-                Minimum="20"
-                Value="70"
-                ValueChanged="standingHeightNumberBox_ValueChanged"
-                SpinButtonPlacementMode="Compact"
-                SmallChange="1"
-                LargeChange="1" />
+                            Header="Standing height"
+                            Width="120"
+                            Maximum="62"
+                            Minimum="11"
+                            Value="70"
+                            ValueChanged="standingHeightNumberBox_ValueChanged"
+                            SpinButtonPlacementMode="Compact"
+                            SmallChange="1"
+                            LargeChange="1" />
             <muxc:NumberBox x:Name="sittingHeightNumberBox"
-                Header="Sitting height:"
-                Width="120"
-                Maximum="100"
-                Minimum="20"
-                Value="20"
-                ValueChanged="sittingHeightNumberBox_ValueChanged"
-                SpinButtonPlacementMode="Compact"
-                SmallChange="1"
-                LargeChange="1" />
+                            Header="Sitting height"
+                            Width="120"
+                            Maximum="62"
+                            Minimum="11"
+                            Value="20"
+                            ValueChanged="sittingHeightNumberBox_ValueChanged"
+                            SpinButtonPlacementMode="Compact"
+                            SmallChange="1"
+                            LargeChange="1" />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="10">
-            <TextBlock Padding="0,6,6,6" Text="Stand"></TextBlock>
             <muxc:NumberBox x:Name="standingIntervalNumberBox"
-                Width="60"
-                Maximum="120"
-                Minimum="15"
-                Value="1"
-                ValueChanged="standingIntervalNumberBox_ValueChanged"
-                SpinButtonPlacementMode="Compact"
-                SmallChange="1"
-                LargeChange="1" />
-            <TextBlock Padding="6" Text="minutes every"></TextBlock>
-            <muxc:NumberBox x:Name="mainIntervalNumberBox"
-                Width="60"
-                Maximum="120"
-                Minimum="1"
-                Value="60"
-                ValueChanged="mainIntervalNumberBox_ValueChanged"
-                SpinButtonPlacementMode="Compact"
-                SmallChange="1"
-                LargeChange="1" />
-            <TextBlock Padding="6" Text="minutes"></TextBlock>
+                            Header="Standing interval"
+                            Width="120"
+                            Maximum="120"
+                            Minimum="5"
+                            Value="1"
+                            ValueChanged="standingIntervalNumberBox_ValueChanged"
+                            SpinButtonPlacementMode="Compact"
+                            SmallChange="1"
+                            LargeChange="1" />
+            <muxc:NumberBox x:Name="sittingIntervalNumberBox"
+                            Header="Sitting interval"
+                            Width="120"
+                            Maximum="120"
+                            Minimum="5"
+                            Value="60"
+                            ValueChanged="sittingIntervalNumberBox_ValueChanged"
+                            SpinButtonPlacementMode="Compact"
+                            SmallChange="1"
+                            LargeChange="1" />
         </StackPanel>
     </StackPanel>
 

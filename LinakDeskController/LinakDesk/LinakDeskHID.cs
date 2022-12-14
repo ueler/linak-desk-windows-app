@@ -1,16 +1,16 @@
-﻿using Nito.AsyncEx;
-using System;
+﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Devices.HumanInterfaceDevice;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using System.Runtime.InteropServices.WindowsRuntime;
+using Nito.AsyncEx;
 
-namespace LinakDeskController
+namespace LinakDeskController.LinakDesk
 {
-    internal class LinakDeskHID
+    internal class LinakDeskHid
     {
         // HID device spec
         private const ushort VENDOR_ID = 0x12D3;
@@ -23,7 +23,7 @@ namespace LinakDeskController
         private const ushort SET_HEIGHT = 0x0305;
 
 
-        private static readonly AsyncLazy<HidDevice> linakDeskHid = new AsyncLazy<HidDevice>(
+        private static readonly AsyncLazy<HidDevice> _linakDeskHid = new(
             async () =>
             {
                 string selector = HidDevice.GetDeviceSelector(USAGE_PAGE, USAGE_ID, VENDOR_ID, PRODUCT_ID);
@@ -32,14 +32,14 @@ namespace LinakDeskController
             }
         );
 
-        public static AsyncLazy<HidDevice> getLinkDeskHid()
+        public static AsyncLazy<HidDevice> GetLinkDeskHid()
         {
-            return linakDeskHid;
+            return _linakDeskHid;
         }
 
-        public async static Task<short> getDeskHeight()
+        public async static Task<short> GetDeskHeight()
         {
-            HidDevice device = await LinakDeskHID.getLinkDeskHid();
+            HidDevice device = await GetLinkDeskHid();
 
             HidFeatureReport report = await device.GetFeatureReportAsync(GET_STATUS);
             DataReader dataReader = DataReader.FromBuffer(report.Data);
@@ -49,9 +49,9 @@ namespace LinakDeskController
             return BitConverter.ToInt16(bytes, 4);
         }
 
-        public async static Task<short> setDeskHeight(short height)
+        public async static Task<short> SetDeskHeight(short height)
         {
-            HidDevice device = await LinakDeskHID.getLinkDeskHid();
+            HidDevice device = await GetLinkDeskHid();
             HidFeatureReport report = device.CreateFeatureReport(SET_HEIGHT);
 
             byte[] bytes = new byte[64];
@@ -59,7 +59,7 @@ namespace LinakDeskController
             byte heightByte2 = Convert.ToByte((height & 0xFF00) >> 8);
 
             bytes.SetValue(Convert.ToByte(0x05), 0);
-            for(int i = 0; i < 4; i++)
+            for(var i = 0; i < 4; i++)
             {
                 bytes.SetValue(heightByte1, i*2 + 1);
                 bytes.SetValue(heightByte2, i*2 + 2);

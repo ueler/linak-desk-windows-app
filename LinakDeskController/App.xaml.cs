@@ -1,48 +1,55 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.ViewManagement;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+﻿using System;
+using System.Reactive.Linq;
+using LinakDeskController.LinakDesk;
+using LinakDeskController.Toast;
+using Microsoft.UI.Xaml;
 
 namespace LinakDeskController
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
-    public partial class App : Application
+    public partial class App
     {
-
-        private LinakDeskControllerSettings settings = new LinakDeskControllerSettings();
+        private readonly LinakDeskCommandCoordinator _linakDeskCommandCoordinator = new();
+        private readonly LinakDeskControllerSettings _settings = new();
+        private readonly DeskStatusTracker _deskStatusTracker = new();
+        private MainWindow _mWindow;
+        private ToastManager _toastManager;
 
         public App()
         {
             this.InitializeComponent();
+            GlobalHotKey.RegisterHotKey("Ctrl + Win + Up",
+                () => _linakDeskCommandCoordinator.MoveToStandingHeight(_settings));
+            GlobalHotKey.RegisterHotKey("Ctrl + Win + Down",
+                () => _linakDeskCommandCoordinator.MoveToSittingHeight(_settings));
         }
 
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
-            settings.loadSettings();
+            _settings.LoadSettings();
+            _linakDeskCommandCoordinator.Run();
 
-            m_window = new MainWindow(settings);
-            m_window.Activate();
+            _mWindow = new MainWindow(_linakDeskCommandCoordinator, _settings);
+            _mWindow.Activate();
+
+            _toastManager = new ToastManager(_mWindow, _linakDeskCommandCoordinator, _deskStatusTracker, _settings);
+            _toastManager.Init();
+
+            Observable
+                .Interval(TimeSpan.FromMinutes(2))
+                .Subscribe(_ =>
+                {
+                    _deskStatusTracker.ReportStatus(_linakDeskCommandCoordinator.GetDeskStatus(_settings));
+
+                    if (_deskStatusTracker.OverSettingsSittingTime(_settings))
+                    {
+                        _toastManager.ShowToastForNewDeskStatus(ToastAction.MoveToStandingHeight);
+                    }
+
+                    if (_deskStatusTracker.OverSettingsStandingTime(_settings))
+                    {
+                        _toastManager.ShowToastForNewDeskStatus(ToastAction.MoveToSittingHeight);
+                    }
+                });
         }
-
-        private MainWindow m_window;
     }
 }
