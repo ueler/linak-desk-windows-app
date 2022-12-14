@@ -8,17 +8,14 @@ public class ToastManager
 {
     private readonly MainWindow _mainWindow;
     private readonly LinakDeskCommandCoordinator _linakDeskCommandCoordinator;
-    private readonly DeskStatusTracker _deskStatusTracker;
     private readonly LinakDeskControllerSettings _settings;
 
     public ToastManager(MainWindow mainWindow,
         LinakDeskCommandCoordinator linakDeskCommandCoordinator,
-        DeskStatusTracker deskStatusTracker,
         LinakDeskControllerSettings settings)
     {
         _mainWindow = mainWindow;
         _linakDeskCommandCoordinator = linakDeskCommandCoordinator;
-        _deskStatusTracker = deskStatusTracker;
         _settings = settings;
     }
 
@@ -58,12 +55,10 @@ public class ToastManager
                 case ToastAction.MoveToSittingHeight:
                     _linakDeskCommandCoordinator.MoveToSittingHeight(_settings);
                     break;
-
                 case ToastAction.MoveToStandingHeight:
                     _linakDeskCommandCoordinator.MoveToStandingHeight(_settings);
                     break;
                 case ToastAction.Skip:
-                    _deskStatusTracker.ResetTime();
                     break;
             }
         });

@@ -31,11 +31,11 @@ namespace LinakDeskController
             _mWindow = new MainWindow(_linakDeskCommandCoordinator, _settings);
             _mWindow.Activate();
 
-            _toastManager = new ToastManager(_mWindow, _linakDeskCommandCoordinator, _deskStatusTracker, _settings);
+            _toastManager = new ToastManager(_mWindow, _linakDeskCommandCoordinator, _settings);
             _toastManager.Init();
 
             Observable
-                .Interval(TimeSpan.FromMinutes(2))
+                .Interval(TimeSpan.FromMinutes(1))
                 .Subscribe(_ =>
                 {
                     _deskStatusTracker.ReportStatus(_linakDeskCommandCoordinator.GetDeskStatus(_settings));
@@ -43,11 +43,13 @@ namespace LinakDeskController
                     if (_deskStatusTracker.OverSettingsSittingTime(_settings))
                     {
                         _toastManager.ShowToastForNewDeskStatus(ToastAction.MoveToStandingHeight);
+                        _deskStatusTracker.ResetTime();
                     }
 
                     if (_deskStatusTracker.OverSettingsStandingTime(_settings))
                     {
                         _toastManager.ShowToastForNewDeskStatus(ToastAction.MoveToSittingHeight);
+                        _deskStatusTracker.ResetTime();
                     }
                 });
         }
