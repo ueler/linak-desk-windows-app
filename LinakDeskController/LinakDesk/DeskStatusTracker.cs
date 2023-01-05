@@ -24,7 +24,7 @@ public class DeskStatusTracker
     {
         if (_deskStatus == DeskStatus.OnSittingHeight)
         {
-            return DateTime.Now.Subtract(_statusStart).Minutes > settings.SittingIntervalInMinutes;
+            return DateTime.Now.Subtract(_statusStart).TotalMinutes > settings.SittingIntervalInMinutes;
         }
 
         return false;
@@ -34,7 +34,7 @@ public class DeskStatusTracker
     {
         if (_deskStatus == DeskStatus.OnStandingHeight)
         {
-            return DateTime.Now.Subtract(_statusStart).Minutes > settings.StandingIntervalInMinutes;
+            return DateTime.Now.Subtract(_statusStart).TotalMinutes > settings.StandingIntervalInMinutes;
         }
 
         return false;
